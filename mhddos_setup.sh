@@ -79,7 +79,7 @@ curl -s --data \"text=\${message}\" \
 
 chmod u+x tg.sh
 
-echo "# 22:00 - 05:00 UTC is 01:00 - 08:00 RU" > crontab
+echo "# 22:00 - 05:00 UTC is 01:00 - 08:00 RU" > cronjob
 echo "0 22 * * * cd /root && docker compose down" >> cronjob
 echo "0 5 * * * cd /root && docker compose up -d" >> cronjob
 echo "15 7-20/2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d" >> cronjob
