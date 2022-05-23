@@ -23,7 +23,7 @@ REQUESTS=$(echo $TOTAL | cut -d' ' -f 5 | sed s/,//)
 TRAFFIC=$(echo $TOTAL | cut -d' ' -f 7,8)
 
 # Find the top 5 targets by traffic
-ALL_TARGETS=$(docker compose logs --tail=1000 | sed -n '/Threads/,/Total/p' | grep -o Target.\*)
+ALL_TARGETS=$(docker compose logs --tail=2000 | sed -n '/Threads/,/Total/p' | grep -o Target.\*)
 TARGETS_MB=$(echo "$ALL_TARGETS" | grep 'MB' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
 TARGETS_KB=$(echo "$ALL_TARGETS" | grep 'kBit' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
 TARGETS_B=$(echo "$ALL_TARGETS" | grep ' Bit' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
