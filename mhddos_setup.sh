@@ -1,9 +1,17 @@
 #!/bin/sh
 
+##### CHANGE LINES BELOW #####
+TG_TOKEN="YOUR TELEGRAM TOKEN"      # Specify your TG token
+TG_CHAT_ID="YOUR TELEGRAM CHAT ID"  # Specify your TG chat ID
+NOTIFY_EVERY_HOUR=2                 # Notify every X hours
+NIGHT_SILENCE=true                  # If 'true', disable attack between 1AM and 8AM MSK (for costs saving)
+DIGITALOCEAN_TOKEN=""               # Specify DO API key to see Account Balance (or you can keep it empty)
+##############################
+
+# Install requirements
 apt-get install -y jq
 
 wget -O - https://get.docker.com/ | bash
-
 systemctl enable docker.service
 systemctl start docker.service
 
@@ -11,78 +19,62 @@ mkdir -p /root/.docker/cli-plugins
 curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o /root/.docker/cli-plugins/docker-compose
 chmod +x /root/.docker/cli-plugins/docker-compose
 
+# Generate files
 cd /root/
 
-echo "
-version: \"3\"
+cat > docker-compose.yaml <<'EOF'
+version: "3"
 services:
   mhddos:
     image: ghcr.io/porthole-ascend-cinnamon/mhddos_proxy:latest
     restart: unless-stopped
-    command:
-        - \"--itarmy\"
-        - \"--table\"
-" > docker-compose.yaml
-docker compose up -d
+    command: --itarmy --debug --lang en
+EOF
 
-echo "
-TG_TOKEN=\"YOUR TELEGRAM TOKEN\"
-TG_CHAT_ID=\"YOUR TELEGRAM CHAT ID\"
-DIGITALOCEAN_TOKEN=\"YOUR DIGITALOCEAN TOKEN\"
+cat > tg.sh <<EOF
+#!/bin/bash
 
-HOST_ID=\$(curl -s http://169.254.169.254/metadata/v1/id)
-FIVEMINAGO=\$(date +%s -d '-5 minutes')
-NOW=\$(date +%s)
+set -x
 
-BD_IN_RESPONSE=\$(curl -s -X GET \
-  -H \"Content-Type: application/json\" \
-  -H \"Authorization: Bearer \$DIGITALOCEAN_TOKEN\" \
-  \"https://api.digitalocean.com/v2/monitoring/metrics/droplet/bandwidth?host_id=\$HOST_ID&interface=public&direction=inbound&start=\$FIVEMINAGO&end=\$NOW\")
+TG_TOKEN=$TG_TOKEN
+TG_CHAT_ID=$TG_CHAT_ID
+NIGHT_SILENCE=$NIGHT_SILENCE
+DIGITALOCEAN_TOKEN=$DIGITALOCEAN_TOKEN
 
-BD_OUT_RESPONSE=\$(curl -s -X GET \
-  -H \"Content-Type: application/json\" \
-  -H \"Authorization: Bearer \$DIGITALOCEAN_TOKEN\" \
-  \"https://api.digitalocean.com/v2/monitoring/metrics/droplet/bandwidth?host_id=\$HOST_ID&interface=public&direction=outbound&start=\$FIVEMINAGO&end=\$NOW\")
-
-BAL_RESPONSE=\$(curl -s -X GET \
-  -H \"Content-Type: application/json\" \
-  -H \"Authorization: Bearer \$DIGITALOCEAN_TOKEN\" \
-  \"https://api.digitalocean.com/v2/customers/my/balance\")
-
-PROXY=\$(docker compose logs --tail=1000 | grep -A 5 \"ascend-cinnamon/mhddos_proxy\" | tail -n 1 | grep -o -e \": [0-9]*\" | sed 's/[^0-9]*//g')
-STATS=\$(docker compose logs -t --tail=1000 | awk '!seen[\$5, \$7]++' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}.*' | sed -e 's/[^[:digit:].-kMbit/s]/|/g' | tr -s '|' ' ' | sed 's/ /:/' | cut -d' ' -f 1,4,5,6 | sed 's/ /, /2' | sed -e 's/ / (/1' -e 's/$/\)/' | sort -k 3 -n | sed 's/\/s//g' | sed 's/ //3')
-
-DB_IN=\$(echo \$BD_IN_RESPONSE | jq '.data.result[].values[-1][1]' | bc -l | xargs printf \"%.2f\")
-DB_OUT=\$(echo \$BD_OUT_RESPONSE | jq '.data.result[].values[-1][1]' | bc -l | xargs printf \"%.2f\")
-BAL_BAL=\$(echo \$BAL_RESPONSE | jq '.month_to_date_balance' | bc)
-BAL_USG=\$(echo \$BAL_RESPONSE | jq '.month_to_date_usage' | bc)
-
-message=\"*Host*: \$(hostname)\"
-message+=\"%0A\"
-message+=\"*Balance/To pay*: \$BAL_BAL/\$BAL_USG\"
-message+=\"%0A\"
-message+=\"*Proxy count*: \$PROXY\"
-message+=\"%0A\"
-message+=\"*Outbound*: \$DB_OUT Mb/s\"
-message+=\"%0A\"
-message+=\"*Inbound*: \$DB_IN Mb/s\"
-message+=\"%0A\"
-message+=\"*Latest stats*:\"
-message+=\"%0A\"
-message+=\"\$STATS\"
-
-curl -s --data \"text=\${message}\" \
-        --data \"chat_id=\$TG_CHAT_ID\" \
-        --data \"parse_mode=markdown\" \
-        \"https://api.telegram.org/bot\${TG_TOKEN}/sendMessage\"
-" > tg.sh
-
+# Download and execute the latest version of tg.sh file
+tmpfile=$(mktemp)
+curl -Ls https://raw.githubusercontent.com/sadviq99/mhddos_proxy-setup/master/tg.sh > \$tmpfile
+source \$tmpfile
+rm \$tmpfile
+EOF
 chmod u+x tg.sh
 
-echo "# 22:00 - 05:00 UTC is 01:00 - 08:00 RU" > cronjob
-echo "0 22 * * * cd /root && docker compose down" >> cronjob
-echo "0 5 * * * cd /root && docker compose up -d" >> cronjob
-echo "15 7-20/2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d" >> cronjob
-echo "@reboot cd /root && docker compose down && docker compose pull && docker compose up -d" >> cronjob
-echo "0 7-20/4 * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1" >> cronjob
+# Run mhddos_proxy
+docker compose up -d
+
+# Setup schedule of start, stop, and notifications
+> cronjob
+if [ "$NIGHT_SILENCE" = true ]; then
+cat > cronjob <<EOF
+# Shutdown the process at 22 UTC (1AM MSK) time
+0 22 * * * cd /root && docker compose down
+# Turn on the process at 5 UTC (8AM MSK) time
+0 5 * * * cd /root && docker compose up -d
+# Send notifications every $NOTIFY_EVERY_HOUR hours 
+0 7-20/$NOTIFY_EVERY_HOUR * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1
+# Restart the process every 2 hours
+15 7-20/2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d
+# Start the process automatically after reboot
+@reboot cd /root && docker compose down && docker compose pull && docker compose up -d
+EOF
+else 
+cat > cronjob <<EOF
+# Send notifications every $NOTIFY_EVERY_HOUR hours
+0 */$NOTIFY_EVERY_HOUR * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1
+# Restart the process every 2 hours
+15 */2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d
+# Start the process automatically after reboot
+@reboot cd /root && docker compose down && docker compose pull && docker compose up -d
+EOF
+fi
 crontab cronjob
