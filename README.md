@@ -1,61 +1,65 @@
-## Installer for [mhddos_proxy](https://github.com/porthole-ascend-cinnamon/mhddos_proxy) tool on DigitalOcean
+## Встановлювач [mhddos_proxy](https://github.com/porthole-ascend-cinnamon/mhddos_proxy) зі сповіщенням у Telegram 
 
-## Опис Українською
+За цією інструкцією ви зможете налаштувати [mhddos_proxy](https://github.com/porthole-ascend-cinnamon/mhddos_proxy) та сповіщення у Телеграм. Це дасть вам змогу зробити це один раз та завжди знати що відбувається на серверах без потреби перевіряти їх кожного дня. Також, це просто красиво ✨
 
-Введіть 3 значеня у скрипті та отримайте повністю налаштованний [mhddos_proxy](https://github.com/porthole-ascend-cinnamon/mhddos_proxy) з нотіфікаціями у Телеграм.
+## Як виглядає сповіщення?
+<img src="img/notifications.png" alt="Приклад сповіщення" width="300"/>
 
-### Відео інструкція
-YouTube - у процессі
+Ви отримаєте наступну інформацію:
+1. **Host** - назва сервера.
+2. **Threads/Proxies** - кількість потоків та проксі виділених на один процесс mhddos_proxy
+3. **Total connections** - скільки зʼєднань встановлено на даний момент
+4. **Total requests** - скільки реквестів в секунду відправляєть на даний момент
+5. **Total traffic** - загальна кількість трафіку відправляєма на усі цілі (чим більше, тим ефективніша атака)
+6. **Top 5 targets by traffic** - цілей може бути сотня, але цікаво знати топ 5 за трафіко - на них йде найсильніша атака
+7. **Open health report** - клікабельна кнопка, що направить вас на [трекер цілей від IT Army](https://itarmy.com.ua/check/)
 
-### Текстова інструкція
-1. Створить DigitalOcean аккаунт (використайте [реферальне посилання](https://m.do.co/c/c5f2c078f46e) та отримайте $100 кредиту, або використайте [один з промокодів](https://www.newcoupons.info/digitalocean-coupon-codes/))
-2. Створіть DigitalOcean [Personal Access Token](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
-3. Створіть Телеграм бот та [отримайте токен](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
-4. Напишіть `/start` вашому боту (відповіді не буде)
-5. Отримайте ваш [Chat ID](https://www.alphr.com/find-chat-id-telegram/)
-6. Почніть створювати Droplet, обирайте:
-    - Ubuntu 20.04
-    - Basic
-    - Regular, $15/month, 2 GB / 2 CPU
-    - Amsterdam / London / Frankfurt
-    - Password, введіть будь-який пароль
-    - Увімкніть Monitoring
-    - Увімкніть Userdata
-7. Вставте контент mhddos_setup.sh файлу у поле `User data`
-8. Замінить значення `TG_TOKEN`, `TG_CHAT_ID`, `DIGITALOCEAN_TOKEN` змінних на ваші значенная з пунктів 2, 3, 5.
-9. Зазначте кількість Dropleps яку ви бажаєте створити (рекомендую 2 дроплета на аккаунт, ви можете мати декілька аккаунтів)
-10. Нажміть `Create Droplet` та насолоджуйтесь
+## Як встановити?
 
-Якщо все добре, ви отримаєте нотіфікацію у Телеграм не пізніше ніж через 4 години.
+> Скрипт налаштування можна використовувати у будь-якому хмарному провайдері та навіть на особистом сервері! У цієї інструкції ми використаємо DigitalOcean, якщо ви запускаєте mhddos_proxy у іншому середвищі, просто ігноруйте кроки повʼязані з DigitalOcean.
 
-<img src="img/example.png" alt="Приклад нотіфікації" width="300"/>
+### Зареєструйте DigitalOcean аккаунт
 
-## English description
+Перейдіть [за посиланням](https://try.digitalocean.com/freetrialoffer/) та створіть новий аккаунт, вам дадуть $100 на 60 днів. Ви будете повинні вказати свою банківську карту, з неї спишуть $5 та одразу повернуть. Якщо карту не приймуть (таке буває, все ок), зареєструйтесь через PayPal. Через PayPal ваші $5 не повернуть, але у вас будет не $100, а $105.
 
-Fill in 3 variables and get ready-to-go [mhddos_proxy](https://github.com/porthole-ascend-cinnamon/mhddos_proxy) installation with notifications to Telegram.
+Зайдіть у вкладку `Billing`, через 24 години після регістрації ви побачите нараховані кредити.
 
-### Video instruction
-YouTube - to be done
+<img src="img/billing.png" alt="Перевірка кредитів" width="900"/>
 
-### Text instruction
-1. Register DigitalOcean account (use [referral link](https://m.do.co/c/c5f2c078f46e) to get $100 credits, or use [one of the promocodes](https://www.newcoupons.info/digitalocean-coupon-codes/)) 
-2. Create DigitalOcean [Personal Access Token](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
-3. Create Telegram Bot and [get the token](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
-4. Type `/start` to your bot (will be no response)
-5. Get your [Chat ID](https://www.alphr.com/find-chat-id-telegram/)
-6. Start Droplet creation
-    - Ubuntu 20.04
-    - Basic
-    - Regular, $15/month, 2 GB / 2 CPU
-    - Amsterdam / London / Frankfurt
-    - Password, set any password
-    - Enable Monitoring
-    - Enable Userdata
-7. Paste content of mhddos_setup.sh file into the `User data` field
-8. Replace values for `TG_TOKEN`, `TG_CHAT_ID`, `DIGITALOCEAN_TOKEN` variables with your values from steps 2, 3, 5.
-9. Set number of Droplets you want to deploy (recommended 2 droplets per account, you can have multiple accounts)
-10. Click `Create Droplet` and enjoy
+Скоріш за все, їх не буде одразу, це нормально. Якщо за 24 години кредити не зʼявились, використайте один з промокодів [за цим посиланням](https://www.newcoupons.info/digitalocean-coupon-codes/).
 
-If everything is alright, you'll receive a notification to your Telegram maximum in 4 hrs.
+Налаштуйте сповіщення про витрати, це допоможе вам вчасно закрити аккаунт щоб не платити гроші. Ви також можете встановили ліміт на оплати в Інтернеті на вашій карті, на всяк випадок.
 
-<img src="img/example.png" alt="Приклад нотіфікації" width="300"/>
+<img src="img/billing_alert.png" alt="Налаштування спровіщення про витрати" width="900"/>
+
+### Створіть Телеграм бота
+
+Зайдіть у Телеграм та знайдіть бота [BotFather](https://t.me/BotFather). Створіть свого бота за допомогою команди `/newbot` та занотуйте отриманий токен.
+
+<img src="img/tg_bot.png" alt="Створення бота" width="900"/>
+
+Перейдіть до щойно створеного бота та напишіть йому `/start`. Ви не отримаєте відповіді, але це потрібно, щоб його активувати.
+
+<img src="img/tg_bot_start.png" alt="Створення бота" width="900"/>
+
+### Отримайте Chat ID
+
+Знайдіть бота [RawDataBot](https://t.me/RawDataBot) та напишіть йому `/start`. Занотуйте значення `chat_id`.
+
+<img src="img/chat_id.png" alt="Отримання Chat ID" width="400"/>
+
+### Створіть API токен у DigitalOcean
+> Це потрібно щоб отримувати інформацію про залишок кредитів у аккаунті. Якщо ви запускаєте mhddos_proxy у іншому середовищі або не бажаєте отримувати цю інформацію, пропустіть цей крок.
+
+Оберіть `API` у панелі ліворуч, після чого натисніть `Generate New Token`.
+
+<img src="img/api_token.png" alt="Створення токену" width="900"/>
+
+У новому окні введіть будь-яку назву токену, оберіть `No expire` та приберіть позначку біля `Write`, нам це не потрібно.
+
+<img src="img/api_token_creation.png" alt="Налаштування токену" width="400"/>
+
+Збережіть собі значення токену, бо його можна побачити лише один раз!
+
+### Нарешті можна створювати сервера!
+
