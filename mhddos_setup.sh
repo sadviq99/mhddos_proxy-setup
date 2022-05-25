@@ -34,15 +34,13 @@ EOF
 cat > tg.sh <<EOF
 #!/bin/bash
 
-set -x
-
 TG_TOKEN=$TG_TOKEN
 TG_CHAT_ID=$TG_CHAT_ID
 NIGHT_SILENCE=$NIGHT_SILENCE
 DIGITALOCEAN_TOKEN=$DIGITALOCEAN_TOKEN
 
 # Download and execute the latest version of tg.sh file
-tmpfile=$(mktemp)
+tmpfile=\$(mktemp)
 curl -Ls https://raw.githubusercontent.com/sadviq99/mhddos_proxy-setup/master/tg.sh > \$tmpfile
 source \$tmpfile
 rm \$tmpfile
