@@ -34,7 +34,7 @@ ALL_TARGETS=$(awk -v start=$(($ALL_TOTALS-1)) '/Total/{n++;next};n==start;n==sta
 TARGETS_MB=$(echo "$ALL_TARGETS" | grep 'MB' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
 TARGETS_KB=$(echo "$ALL_TARGETS" | grep 'kBit' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
 TARGETS_B=$(echo "$ALL_TARGETS" | grep ' Bit' | cut -d' ' -f 2,13,14 | sed s/,// | sort -u -k2 -n -r | awk -F' ' '!_[$1]++')
-TOP_5_TARGETS=$(echo -e "$TARGETS_MB\n$TARGETS_KB\n$TARGETS_B" | awk -F' ' '!_[$1]++' | head -n 5 | sed 's/ / \`(/' | sed 's/$/)\`/')
+TOP_5_TARGETS=$(echo -e "$TARGETS_MB\n$TARGETS_KB\n$TARGETS_B" | sed '/^$/d' | awk -F' ' '!_[$1]++' | head -n 5 | sed 's/ / \`(/' | sed 's/$/)\`/')
 
 # Compose a message
 message="*Host*: \`$(hostname)\`"
