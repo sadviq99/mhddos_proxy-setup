@@ -28,7 +28,8 @@ services:
   mhddos:
     image: ghcr.io/porthole-ascend-cinnamon/mhddos_proxy:latest
     restart: unless-stopped
-    command: --itarmy --debug --lang en
+    network_mode: host
+    command: --lang en
 EOF
 
 cat > tg.sh <<EOF
