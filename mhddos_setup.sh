@@ -28,7 +28,6 @@ services:
   mhddos:
     image: ghcr.io/porthole-ascend-cinnamon/mhddos_proxy:latest
     restart: unless-stopped
-    network_mode: host
     command: --lang en
 EOF
 
@@ -55,14 +54,12 @@ docker compose up -d
 > cronjob
 if [ "$NIGHT_SILENCE" = true ]; then
 cat > cronjob <<EOF
-# Shutdown the process at 22 UTC (1AM MSK) time
-0 22 * * * cd /root && docker compose down
+# Shutdown the process at ~22 UTC (1AM MSK) time
+01 22 * * * cd /root && docker compose down
 # Turn on the process at 5 UTC (8AM MSK) time
-0 5 * * * cd /root && docker compose up -d
+0 5 * * * cd /root && docker compose pull && docker compose up -d
 # Send notifications every $NOTIFY_EVERY_HOUR hours 
-0 7-20/$NOTIFY_EVERY_HOUR * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1
-# Restart the process every 2 hours
-15 7-20/2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d
+0 7-22/$NOTIFY_EVERY_HOUR * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1
 # Start the process automatically after reboot
 @reboot cd /root && docker compose down && docker compose pull && docker compose up -d
 EOF
@@ -70,8 +67,8 @@ else
 cat > cronjob <<EOF
 # Send notifications every $NOTIFY_EVERY_HOUR hours
 0 */$NOTIFY_EVERY_HOUR * * * cd /root/ && /bin/bash tg.sh > tg.log 2>&1
-# Restart the process every 2 hours
-15 */2 * * * cd /root && docker compose down && docker compose pull && docker compose up -d
+# Restart the process at ~22 UTC (1AM MSK) time 
+01 22 * * * cd /root && docker compose down && docker compose pull && docker compose up -d
 # Start the process automatically after reboot
 @reboot cd /root && docker compose down && docker compose pull && docker compose up -d
 EOF

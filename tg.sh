@@ -64,21 +64,30 @@ Packets, k/s|$PACKETS_15|$PACKETS_60|$PACKETS_ALL
 Traffic, M/s|$TRAFFIC_15|$TRAFFIC_60|$TRAFFIC_ALL
 END
 )
-TABLE=$(echo "$STATS" | column -t -n -s'|')
+TABLE=$(echo "$STATS" | column -t -s'|')
 
-# Get number of threads
-THREADS=$(grep -o Threads.* $LOGS| tail -n 1 | cut -d' ' -f 2)
+# Get total amount of traffic send
+TOTAL_TRAFFIC=$(docker stats --no-stream --format '{{.NetIO}}' | cut -d'/' -f1 | xargs)
+
+# Get the time of the attach
+ATTACK_STARTED=$(docker ps --format '{{.RunningFor}}')
 
 # Compose a message
-message="*Host*: \`\`\`$(hostname)\`\`\`"
+message="💻 *$(hostname)*"
 message+="%0A"
 if [ ! -z "$DIGITALOCEAN_TOKEN" ]; then
-    message+="*Credits*: \`\`\`$BAL_BAL\`\`\`"
+    message+="🤑 *Credits*: \`\`\`$BAL_BAL\`\`\`"
     message+="%0A"
-    message+="*To pay*: \`\`\`$BAL_USG\`\`\`"
+    message+="💸 *To pay*: \`\`\`$BAL_USG\`\`\`"
     message+="%0A"
 fi
-message+="*Threads*: \`\`\`$THREADS\`\`\`"
+
+if [ "$TOTAL_TRAFFIC" != "0B" ]; then
+    message+="📤 *Traffic sent*: \`\`\`$TOTAL_TRAFFIC\`\`\`"
+    message+="%0A"
+fi
+
+message+="⏱ *Attack started*: $ATTACK_STARTED"
 message+="%0A"
 message+=$(cat <<-END
 \`\`\`
