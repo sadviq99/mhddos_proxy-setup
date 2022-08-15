@@ -28,9 +28,9 @@ if [ -z "$LOGS_15" ]; then
     PACKETS_15='n/a'
     TRAFFIC_15='n/a'
 else
-    CAPACITY_15=$(echo "scale=0; $(echo "$LOGS_15" | grep -o "Capacity.*%" | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -o "Capacity.*%" | wc -l)" | bc)
+    CAPACITY_15=$(echo "scale=1; $(echo "$LOGS_15" | grep -o "Capacity.*%" | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -o "Capacity.*%" | wc -l)" | bc)
     CONNECTIONS_15=$(echo "scale=0; $(echo "$LOGS_15" | grep -oE "Connections: [0-9]*," | cut -d' ' -f2 | sed s/,//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -oE "Connections: [0-9]*," | wc -l)" | bc)
-    PACKETS_15=$(echo "scale=0; $(echo "$LOGS_15" | grep -oE "Packets: [0-9.]*k" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -oE "Packets: [0-9.]*k" | wc -l)" | bc)
+    PACKETS_15=$(echo "scale=1; $(echo "$LOGS_15" | grep -oE "Packets: [0-9.]*k" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -oE "Packets: [0-9.]*k" | wc -l)" | bc)
     TRAFFIC_15=$(echo "scale=0; $(echo "$LOGS_15" | grep -oE "Traffic: [0-9.]* MBit" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_15" | grep -oE "Traffic: [0-9.]* MBit" | wc -l)" | bc)
 fi
 
@@ -42,16 +42,16 @@ if [ -z "$LOGS_60" ]; then
     PACKETS_60='n/a'
     TRAFFIC_60='n/a'
 else
-    CAPACITY_60=$(echo "scale=0; $(echo "$LOGS_60" | grep -o "Capacity.*%" | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -o "Capacity.*%" | wc -l)" | bc)
+    CAPACITY_60=$(echo "scale=1; $(echo "$LOGS_60" | grep -o "Capacity.*%" | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -o "Capacity.*%" | wc -l)" | bc)
     CONNECTIONS_60=$(echo "scale=0; $(echo "$LOGS_60" | grep -oE "Connections: [0-9]*," | cut -d' ' -f2 | sed s/,//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -oE "Connections: [0-9]*," | wc -l)" | bc)
-    PACKETS_60=$(echo "scale=0; $(echo "$LOGS_60" | grep -oE "Packets: [0-9.]*k" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -oE "Packets: [0-9.]*k" | wc -l)" | bc)
+    PACKETS_60=$(echo "scale=1; $(echo "$LOGS_60" | grep -oE "Packets: [0-9.]*k" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -oE "Packets: [0-9.]*k" | wc -l)" | bc)
     TRAFFIC_60=$(echo "scale=0; $(echo "$LOGS_60" | grep -oE "Traffic: [0-9.]* MBit" | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(echo "$LOGS_60" | grep -oE "Traffic: [0-9.]* MBit" | wc -l)" | bc)
 fi
 
 # Get average statistic for the all time
-CAPACITY_ALL=$(echo "scale=0; $(grep -o "Capacity.*%" $LOGS | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -o "Capacity.*%" $LOGS| wc -l)" | bc)
+CAPACITY_ALL=$(echo "scale=1; $(grep -o "Capacity.*%" $LOGS | cut -d' ' -f2 | sed s/%//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -o "Capacity.*%" $LOGS| wc -l)" | bc)
 CONNECTIONS_ALL=$(echo "scale=0; $(grep -oE "Connections: [0-9]*," $LOGS | cut -d' ' -f2 | sed s/,//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -oE "Connections: [0-9]*," $LOGS | wc -l)" | bc)
-PACKETS_ALL=$(echo "scale=0; $(grep -oE "Packets: [0-9.]*k" $LOGS | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -oE "Packets: [0-9.]*k" $LOGS | wc -l)" | bc)
+PACKETS_ALL=$(echo "scale=1; $(grep -oE "Packets: [0-9.]*k" $LOGS | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -oE "Packets: [0-9.]*k" $LOGS | wc -l)" | bc)
 TRAFFIC_ALL=$(echo "scale=0; $(grep -oE "Traffic: [0-9.]* MBit" $LOGS | cut -d' ' -f2 | sed s/k//g | xargs  | sed -e 's/\ /+/g' | bc)/$(grep -oE "Traffic: [0-9.]* MBit" $LOGS | wc -l)" | bc)
 
 # Create table with statistic
