@@ -67,7 +67,7 @@ END
 TABLE=$(echo "$STATS" | column -t -s'|')
 
 # Get total amount of traffic send
-TOTAL_TRAFFIC=$(docker stats --no-stream --format '{{.NetIO}}' | cut -d'/' -f1 | xargs)
+TOTAL_TRAFFIC=$(docker stats --no-stream --format '{{.NetIO}}' | cut -d'/' -f2 | xargs)
 
 # Get the time of the attach
 ATTACK_STARTED=$(docker ps --format '{{.RunningFor}}')
